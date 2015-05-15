@@ -4,6 +4,7 @@
     <!-- define colors used inside the app-->
     <color name="colorPrimary">#666666</color>
     <color name="recycleItemColor">#333333</color>
+    <color name="toolbarColor">#ff0093ff</color>
 
 
 
@@ -15,6 +16,18 @@
         <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="searchViewStyle">@style/MySearchViewStyle</item>
     </style>
+
+    <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
+
+    <!-- Close button icon -->
+    <item name="closeIcon">@drawable/ic_action_close</item>
+    <!-- Search button icon -->
+    <item name="searchIcon">@drawable/ic_action_search</item>
+
+    </style>
+
+
 
 </resources>
