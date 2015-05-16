@@ -45,15 +45,13 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
                 intent.putExtra("imageUrl", element.getImageURL());
                 intent.putExtra("videoId", element.getVideoId());
 
-
                 home.startActivity(intent);
                 home.overridePendingTransition(R.anim.right_to_left_enter_element, R.anim.right_to_left_exit_element);
             }
         });
 
-        // create ViewHolder
-        ViewHolder viewHolder = new ViewHolder(itemLayoutView);
-        return viewHolder;
+        // create ViewHolder and return it
+        return new ViewHolder(itemLayoutView);
     }
 
     // the >int i< variable refers to the positin of the element inside the view
@@ -70,7 +68,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         viewHolder.txtViewDescription.setText(element.getVideoDescription());
 
         //set Images(Thumbnails)
-        //TODO check AQuery doc, example code (prefferably add some animations or better image caching)
+        //TODO check AQuery doc, example code (prefferably add some animations, better image caching)
         AQuery aq = new AQuery(viewHolder.imgViewIcon);
         aq.id(viewHolder.imgViewIcon.getId()).image(dataItems[i].getImageURL(), true, true);
 

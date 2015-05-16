@@ -2,6 +2,8 @@ package com.example.filipsaina.videoping;
 
 import android.os.Looper;
 
+import com.example.filipsaina.videoping.provider.Provider;
+
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -52,5 +54,6 @@ public class ThreadManager extends Thread{
             notifyListener();         //  <<==== should pass data
         }
     }
+
 
 }

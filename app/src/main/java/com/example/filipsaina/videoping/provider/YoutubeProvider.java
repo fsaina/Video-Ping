@@ -1,7 +1,8 @@
-package com.example.filipsaina.videoping;
+package com.example.filipsaina.videoping.provider;
 
-import android.view.View;
+import android.support.v4.app.Fragment;
 
+import com.example.filipsaina.videoping.RecycleViewItemData;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -18,26 +19,25 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * YouTube prvoider implementation.
+ * YouTube provider implementation.
  * (Every provider implementation must be added to the > Provider[] listOfAllProviders < variable
- * within the HomeActivity.java calss)
+ * within the HomeActivity.java calls)
  * Created by filipsaina on 15/05/15.
  */
-public class YoutubeProvider  implements Provider {
+public class YoutubeProvider implements Provider {
 
     //predefined youtube necessary parameters
     private static final String PROVIDER_NAME = "Youtube";
-    private static final String YOUTUBE_API_KEY = "AIzaSyD0dkCKWmkzLIJJ0ALFokXlnq7e9n9epyo";
+    protected static final String YOUTUBE_API_KEY = "AIzaSyD0dkCKWmkzLIJJ0ALFokXlnq7e9n9epyo";
     private static final String APPLICATION_NAME = "Video ping";
     private static final long LIMIT_RESULTS = 20;
 
     private List<RecycleViewItemData> providerResult = new ArrayList<>();
 
-
-    /*
-    Method requred by the Provider interface.
-    All data fetching, internal client object initialization and manipulation sould be
-    done here, as for data grabing and formating.
+    /**
+    Method required by the Provider interface.
+    All data fetching, internal client object initialization and manipulation should be
+    done here, as for data grabbing and formatting.
      */
     @Override
     public List<RecycleViewItemData> fetchDataFromServer(String searchTerm) {
@@ -47,7 +47,6 @@ public class YoutubeProvider  implements Provider {
                 }
             }).setApplicationName(APPLICATION_NAME).build();
             YouTube.Search.List search = youtube.search().list("id,snippet");
-
 
             //set key
             search.setKey(YOUTUBE_API_KEY);
@@ -78,22 +77,18 @@ public class YoutubeProvider  implements Provider {
         return PROVIDER_NAME;
     }
 
-
-    /*
-    This is a necessary method that should provide the caller with a View element that
+    /**
+    This is a necessary method that should provide the caller with Player Fragment element that
     is capable of playing the video the service provides.
-    Later this View is going to be replaced with anoteher view at runtime
-
      */
     @Override
-    public View getPlayerView(final String videoId) {
-
-
-        return null;
+    public Fragment getPlayerFragment(String videoId) {
+        return (Fragment) YoutubeVideoFragment.newInstance(videoId);
     }
 
+
     /*
-    This method is used to transfer receved data provided by the YouTube class
+    This method is used to transfer received data provided by the YouTube class
     from type <SearchResult> into <RecycleViewItemData> that is required for the
     fetchDataFromServer method
     */

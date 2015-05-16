@@ -1,11 +1,17 @@
 package com.example.filipsaina.videoping;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.filipsaina.videoping.provider.YoutubeProvider;
 
-/*
+
+/**
 Activity that will be used to play video
  */
 
@@ -38,13 +44,26 @@ public class PlayerActivity extends ActionBarActivity {
         title.setText(currentElement.getVideoTitle());
 
 
+        //now populate key elements of our video player application
+        //by replacing finished elements in out layout
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        //TODO for simplicity Im just using the Youtube service, here should be added
+        //(based on 'currentElement') selection of Services that will call getPlayerFragment
+        YoutubeProvider yp = new YoutubeProvider();
+        Fragment player = yp.getPlayerFragment(currentElement.getVideoId());
+
+        RelativeLayout playerSpace = (RelativeLayout) findViewById(R.id.player);
+        fragmentTransaction.add(playerSpace.getId(), player, "something").commit();     //TODO check documentation about this "something"
+
     }
 
     @Override
     public void onBackPressed() {
         finish();
         overridePendingTransition(R.anim.left_to_right_enter_element, R.anim.left_to_right_exit_element);
-
     }
 
     //TODO implement this stuff

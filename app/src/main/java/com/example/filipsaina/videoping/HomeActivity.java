@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 
+import com.example.filipsaina.videoping.provider.Provider;
+import com.example.filipsaina.videoping.provider.YoutubeProvider;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -20,6 +22,10 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 
+/**
+Initaial class Activity
+ */
+
 public class HomeActivity extends ActionBarActivity implements ThreadCompleteListener {
 
     //adding new providers is done here, simple as including them in this array
@@ -27,12 +33,8 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
             new YoutubeProvider()
     };
 
-
     //drawer reference(on drawerSetup)
     private Drawer.Result drawer = null;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,9 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setTitle(null);
+            try {
+                getSupportActionBar().setTitle(null);
+            }catch (Exception e){}      //TODO bad soution(find better one)
         }
 
         //dummy data
@@ -89,7 +93,6 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
     }
 
-
     //event when the user presses the button
     //new threads are dispached and the UI thread awaits for results
     public void onSearchButtonPressed(View v){
@@ -104,13 +107,11 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
             tm.addProvider(provider);
         }
 
-
         //start loading animation
         SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
         tm.start();
-
     }
 
     /*
@@ -168,7 +169,6 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
         }
     }
 
-
     //TODO define settings parameters and basic settings functinality
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
@@ -191,6 +191,5 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 //
 //        return super.onOptionsItemSelected(item);
 //    }
-
 
 }

@@ -1,13 +1,11 @@
 package com.example.filipsaina.videoping;
 
 /**
- * Created by filipsaina on 15/05/15.
+Data model used for defining an element that populates the RecycleView widget.
+Created by filipsaina on 15/05/15.
  */
 
-
-
 public class RecycleViewItemData {
-    //TODO define the view and define the data model that the layout will use(missing basic data features)
 
     private String videoTitle;
     private String videoId;
@@ -32,18 +30,7 @@ public class RecycleViewItemData {
     public String getVideoDescription(){
         return videoDescrition;
     }
-
     public String getVideoId(){
         return videoId;
-    }
-
-//    public Provider getProvider(){
-//        return provider;
-//    }
-
-
-    public String getVideoUrl(){
-        //http://asdfadsfadsf.com/+ ... + videId
-        return  null;  //TODO implement this
     }
 }
