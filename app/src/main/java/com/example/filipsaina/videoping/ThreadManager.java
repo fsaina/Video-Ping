@@ -17,6 +17,11 @@ public class ThreadManager extends Thread{
     private ThreadCompleteListener listener = null;     //TODO check this line of code, provide exceptions
     private Set<Provider> jobs = new CopyOnWriteArraySet<>();
     private List<RecycleViewItemData> fullResponse = null;
+    private String searchTerm;
+
+    public ThreadManager(String searchTerm){
+        this.searchTerm = searchTerm;
+    }
 
 
     public void addProvider(Provider job){
@@ -37,7 +42,7 @@ public class ThreadManager extends Thread{
         try{
 
             for(Provider provider: jobs){
-                List<RecycleViewItemData> response = provider.fetchDataFromServer();
+                List<RecycleViewItemData> response = provider.fetchDataFromServer(searchTerm);
                 if(response != null){
                     fullResponse = response;    //TODO make a list within a list to store responses from other providers
                 }

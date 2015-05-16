@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="95dp"
-    android:padding="6dp"
+    android:layout_height="100dp"
+    android:padding="5dp"
     android:layout_margin="1dp"
     android:background="@color/recycleItemColor"
     android:clickable="true">
@@ -29,12 +29,12 @@
     <TextView
         android:id="@+id/item_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:layout_toRightOf="@+id/item_icon"
         android:textColor="@android:color/darker_gray"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:textSize="17sp"
+        android:textSize="13sp"
         android:clickable="false"
         android:enabled="true"
         android:text="item_title"
@@ -62,26 +62,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="item_author"
-        android:id="@+id/item_author"
+        android:text="item_description"
+        android:id="@+id/item_description"
         android:layout_below="@+id/item_title"
         android:layout_alignLeft="@+id/item_title"
         android:layout_alignStart="@+id/item_title"
         android:paddingLeft="10dp"
-        android:textSize="11sp"
+        android:textSize="9sp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/imageView" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="numberOfViews"
-        android:id="@+id/textView"
+        android:text="duration"
+        android:id="@+id/duration"
         android:paddingLeft="10dp"
         android:layout_alignBottom="@+id/item_icon"
-        android:layout_alignLeft="@+id/item_author"
-        android:layout_alignStart="@+id/item_author"
+        android:layout_alignLeft="@+id/item_description"
+        android:layout_alignStart="@+id/item_description"
         android:textSize="8sp" />
 
 </RelativeLayout>

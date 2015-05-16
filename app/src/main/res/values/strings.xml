@@ -5,4 +5,6 @@
     <string name="action_settings">Settings</string>
     <string name="drawer_item_home">This is the title</string>
     <string name="drawer_item_settings">This are the settings</string>
+    <string name="title_activity_player">PlayerActivity</string>
+    <string name="search_field_initial_text">Search</string>
 </resources>

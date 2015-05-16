@@ -1,5 +1,7 @@
 package com.example.filipsaina.videoping;
 
+import android.view.View;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,8 @@ import java.util.List;
  */
 public interface Provider {
 
-    public List<RecycleViewItemData> fetchDataFromServer();
+    public List<RecycleViewItemData> fetchDataFromServer(String searchTerm);
+    public String getProviderName();
+    public View getPlayerView(final String videoId);
 
 }

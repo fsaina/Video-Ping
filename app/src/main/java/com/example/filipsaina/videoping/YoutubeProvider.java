@@ -1,5 +1,7 @@
 package com.example.filipsaina.videoping;
 
+import android.view.View;
+
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -16,34 +18,34 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * YouTube prvoider implementation.
+ * (Every provider implementation must be added to the > Provider[] listOfAllProviders < variable
+ * within the HomeActivity.java calss)
  * Created by filipsaina on 15/05/15.
  */
-public class YoutubeProvider implements Provider {
+public class YoutubeProvider  implements Provider {
 
-    private ThreadCompleteListener listener = null;
-
-    //keys to services
+    //predefined youtube necessary parameters
+    private static final String PROVIDER_NAME = "Youtube";
     private static final String YOUTUBE_API_KEY = "AIzaSyD0dkCKWmkzLIJJ0ALFokXlnq7e9n9epyo";
+    private static final String APPLICATION_NAME = "Video ping";
     private static final long LIMIT_RESULTS = 20;
 
-    String searchTerm = "Charlie bit my finger";            //TODO implement real user input
-
-    List<RecycleViewItemData> providerResult = new ArrayList<>();
-
-    public YoutubeProvider(String searchTerm){
-        this.searchTerm = searchTerm;
-    }
+    private List<RecycleViewItemData> providerResult = new ArrayList<>();
 
 
-    //TODO make documentation
-    //method will return null in case of an excepition
+    /*
+    Method requred by the Provider interface.
+    All data fetching, internal client object initialization and manipulation sould be
+    done here, as for data grabing and formating.
+     */
     @Override
-    public List<RecycleViewItemData> fetchDataFromServer() {
+    public List<RecycleViewItemData> fetchDataFromServer(String searchTerm) {
         try {
             YouTube youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
                 public void initialize(HttpRequest request) throws IOException {
                 }
-            }).setApplicationName("Video ping").build();
+            }).setApplicationName(APPLICATION_NAME).build();
             YouTube.Search.List search = youtube.search().list("id,snippet");
 
 
@@ -55,13 +57,13 @@ public class YoutubeProvider implements Provider {
             search.setType("video");
 
             //grab from the servers just the stuff we need
-            search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)");
+            search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url,snippet/description)");
             search.setMaxResults(LIMIT_RESULTS);
 
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();
             if (searchResultList != null) {
-                prettyPrint(searchResultList.iterator(), searchTerm);
+                dataFormat(searchResultList.iterator());
             }
 
         } catch (Exception e) {
@@ -71,12 +73,31 @@ public class YoutubeProvider implements Provider {
         return providerResult;
     }
 
-    private void prettyPrint(Iterator<SearchResult> iteratorSearchResults, String query) {
+    @Override
+    public String getProviderName() {
+        return PROVIDER_NAME;
+    }
 
-        if (!iteratorSearchResults.hasNext()) {
-            System.out.println(" There aren't any results for your query.");
-        }
 
+    /*
+    This is a necessary method that should provide the caller with a View element that
+    is capable of playing the video the service provides.
+    Later this View is going to be replaced with anoteher view at runtime
+
+     */
+    @Override
+    public View getPlayerView(final String videoId) {
+
+
+        return null;
+    }
+
+    /*
+    This method is used to transfer receved data provided by the YouTube class
+    from type <SearchResult> into <RecycleViewItemData> that is required for the
+    fetchDataFromServer method
+    */
+    private void dataFormat(Iterator<SearchResult> iteratorSearchResults) {
         while (iteratorSearchResults.hasNext()) {
 
             SearchResult singleVideo = iteratorSearchResults.next();
@@ -86,15 +107,13 @@ public class YoutubeProvider implements Provider {
             // item will not contain a video ID.
             if (rId.getKind().equals("youtube#video")) {
                 Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
-//
-//                System.out.println(" Video Id" + rId.getVideoId());
-//                System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
-//                System.out.println(" Thumbnail: " + thumbnail.getUrl());
-//                System.out.println("\n-------------------------------------------------------------\n");
-
-                providerResult.add(new RecycleViewItemData(singleVideo.getSnippet().getTitle(), thumbnail.getUrl(), rId.getVideoId()));
-
+                providerResult.add(new RecycleViewItemData(
+                        singleVideo.getSnippet().getTitle(),    // video title
+                        thumbnail.getUrl(),                     // thumbnail URL
+                        rId.getVideoId(),                       // video ID
+                        singleVideo.getSnippet().getDescription()));        //description of the video
             }
         }
     }
+
 }

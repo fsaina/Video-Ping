@@ -12,11 +12,13 @@ public class RecycleViewItemData {
     private String videoTitle;
     private String videoId;
     private String imageURL;
+    private String videoDescrition;
 
-    public RecycleViewItemData(String title, String url, String videoId){
-            videoTitle = title;
-            imageURL = url;
+    public RecycleViewItemData(String videoTitle, String imageURL, String videoId, String videoDescription){
+            this.videoTitle = videoTitle;
+            this.imageURL = imageURL;
             this.videoId = videoId;
+            this.videoDescrition = videoDescription;
     }
 
     public String getImageURL() {
@@ -25,5 +27,23 @@ public class RecycleViewItemData {
 
     public String getVideoTitle() {
         return videoTitle;
+    }
+
+    public String getVideoDescription(){
+        return videoDescrition;
+    }
+
+    public String getVideoId(){
+        return videoId;
+    }
+
+//    public Provider getProvider(){
+//        return provider;
+//    }
+
+
+    public String getVideoUrl(){
+        //http://asdfadsfadsf.com/+ ... + videId
+        return  null;  //TODO implement this
     }
 }

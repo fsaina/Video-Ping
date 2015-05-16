@@ -11,18 +11,26 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+
 
 public class HomeActivity extends ActionBarActivity implements ThreadCompleteListener {
 
+    //adding new providers is done here, simple as including them in this array
+    public Provider[] listOfAllProviders = {
+            new YoutubeProvider()
+    };
+
+
     //drawer reference(on drawerSetup)
     private Drawer.Result drawer = null;
+
 
 
 
@@ -38,9 +46,7 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
         //dummy data
         List<RecycleViewItemData> list = new ArrayList<RecycleViewItemData>();
-        list.add(new RecycleViewItemData("Title 1", "url", "asd"));
-        list.add(new RecycleViewItemData("Title 2", "url", "asd"));
-        list.add(new RecycleViewItemData("Title 3", "url", "asd"));
+
 
         //recyle view setup with all its elements and settings
         recylerViewSetup(list);
@@ -48,40 +54,69 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
         //drawer setup
         drawerSetup();
 
-    }
-
-
-    @Override
-    public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
-        runOnUiThread(new Runnable() {
+        //search Filed onClick
+        final EditText searchField = (EditText) findViewById(R.id.searchField);
+        final String initialMessage = this.getResources().getString(R.string.search_field_initial_text);
+        searchField.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                recylerViewSetup(data);
+            public void onClick(View v) {
+                //on user click clear the field
+                if(searchField.getText().toString().equalsIgnoreCase(initialMessage)){
+                    searchField.setText("");
+                    searchField.requestFocus();
+                }
             }
         });
 
     }
 
+    //this method is called everythime a dispached thread completed its taks
+    //in this implementation there is just one Thread
+    @Override
+    public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //update the View
+                recylerViewSetup(data);
+
+                //end animation
+                SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
+        });
+
+    }
+
+
+    //event when the user presses the button
+    //new threads are dispached and the UI thread awaits for results
     public void onSearchButtonPressed(View v){
-        EditText edv = (EditText) findViewById(R.id.editText);
+        EditText edv = (EditText) findViewById(R.id.searchField);
         String searchTerm = edv.getText().toString();
 
-
-        //TODO better thread implementation, big memory hog (more implements Runnable, less extends Thread)
-        //release the hounds!
-        ThreadManager tm = new ThreadManager();
+        ThreadManager tm = new ThreadManager(searchTerm);
         tm.addListener(this);
-        //add all the providers here
-        Provider youTube = new YoutubeProvider(searchTerm);
-        tm.addProvider(youTube);
+
+        //list all the providers as the job the thread will need to do
+        for(Provider provider : listOfAllProviders){
+            tm.addProvider(provider);
+        }
+
+
+        //start loading animation
+        SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         tm.start();
 
     }
 
     /*
-        Method used to set up the recycleView with all its elements.
-        Method is invoked with the 'data' parameter that consists of RecycleViewItemData objects
-         */
+    Method used to set up the recycleView with all its elements.
+    Method is invoked with the 'data' parameter that consists of RecycleViewItemData objects
+    */
     private void recylerViewSetup(List<RecycleViewItemData> data) {
         //grab a reference to the recyclerView
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
@@ -89,17 +124,20 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
         rv.setLayoutManager(new LinearLayoutManager(this));
 
         RecycleViewItemData[] array = data.toArray(new RecycleViewItemData[data.size()]);
-        RecycleViewAdapter rva = new RecycleViewAdapter(array, rv);
+        RecycleViewAdapter rva = new RecycleViewAdapter(array, rv, this);
 
         rv.setAdapter(rva);
         rv.setItemAnimator(new DefaultItemAnimator());
+
+        //clean the data(necessary)
+        data.clear();
     }
 
     /*
     Set up the drawer troughout the application and all its elements
      */
     private void drawerSetup() {
-        //TODO add to the drawer a title saying something like "Selected services:"
+        //TODO add to the drawer a title saying something like "Select video service provider:"
         //for more details
         //https://github.com/mikepenz/MaterialDrawer
         Drawer.Result result = new Drawer()
@@ -113,16 +151,15 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
                 })
                 .build();
 
-
-        //TODO add a number of services
-        result.addItem(new DividerDrawerItem());
-        result.addItem(new PrimaryDrawerItem().withName("Youtube"));
-        result.addItem(new PrimaryDrawerItem().withName("Vimeo"));
+        for(Provider provider: listOfAllProviders){
+            result.addItem(new PrimaryDrawerItem().withName(provider.getProviderName()));
+        }
         this.drawer = result;
     }
 
     //method used to change the open/close state of the drawer
     //used as an onClick call
+    //should be used in case an menu button is added to the toolbar widget
     public void drawerChangeState(View v){
         if(drawer.isDrawerOpen() == true){
             drawer.closeDrawer();
