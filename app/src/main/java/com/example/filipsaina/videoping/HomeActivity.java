@@ -8,7 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 
 import com.example.filipsaina.videoping.provider.Provider;
 import com.example.filipsaina.videoping.provider.YoutubeProvider;
@@ -16,7 +17,6 @@ import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
@@ -35,6 +35,7 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
     //drawer reference(on drawerSetup)
     private Drawer.Result drawer = null;
+    private long noThread =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,60 +49,52 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
             }catch (Exception e){}      //TODO bad soution(find better one)
         }
 
-        //dummy data
-        List<RecycleViewItemData> list = new ArrayList<RecycleViewItemData>();
-
-
-        //recyle view setup with all its elements and settings
-        recylerViewSetup(list);
+        //recycleView setup
+        recyclerViewSetup();
 
         //drawer setup
         drawerSetup();
 
-        //search Filed onClick
-        final EditText searchField = (EditText) findViewById(R.id.searchField);
-        final String initialMessage = this.getResources().getString(R.string.search_field_initial_text);
-        searchField.setOnClickListener(new View.OnClickListener() {
+        //seatch button setup
+        Button searchButton = (Button) findViewById(R.id.button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //on user click clear the field
-                if(searchField.getText().toString().equalsIgnoreCase(initialMessage)){
-                    searchField.setText("");
-                    searchField.requestFocus();
-                }
+                onSearchButtonPressed(null);
             }
         });
+
 
     }
 
-    //this method is called everythime a dispached thread completed its taks
+    //this method is called everythime a dispached thread completed its task
     //in this implementation there is just one Thread
     @Override
     public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //update the View
-                recylerViewSetup(data);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //update the RecyclerView
+                    recyclerUpdateView(data);
 
-                //end animation
-                SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-
-        });
+                    //end animation
+                    SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
+                    progressBar.setVisibility(View.INVISIBLE);
+                }
+            });
 
     }
 
     //event when the user presses the button
     //new threads are dispached and the UI thread awaits for results
     public void onSearchButtonPressed(View v){
-        EditText edv = (EditText) findViewById(R.id.searchField);
+        AutoCompleteTextView edv = (AutoCompleteTextView) findViewById(R.id.searchField);
         String searchTerm = edv.getText().toString();
 
         ThreadManager tm = new ThreadManager(searchTerm);
         tm.addListener(this);
 
+        //TODO should i use all the providers at once or just one? fix this accordingly
         //list all the providers as the job the thread will need to do
         for(Provider provider : listOfAllProviders){
             tm.addProvider(provider);
@@ -115,20 +108,32 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
     }
 
     /*
-    Method used to set up the recycleView with all its elements.
-    Method is invoked with the 'data' parameter that consists of RecycleViewItemData objects
+    Initial widget setup that is called once, onCreate
     */
-    private void recylerViewSetup(List<RecycleViewItemData> data) {
+    private void recyclerViewSetup() {
         //grab a reference to the recyclerView
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
-
         rv.setLayoutManager(new LinearLayoutManager(this));
+        RecycleViewItemData[] array = new RecycleViewItemData[0];
+        RecycleViewAdapter rva = new RecycleViewAdapter(array, rv, this);
+        rv.setAdapter(rva);
+        rv.setItemAnimator(new DefaultItemAnimator());
+    }
 
+    /**
+     * Method used to update the recycleView with all its elements.
+     Method is invoked with the 'data' parameter that consists of RecycleViewItemData objects
+     which will populate the widget
+     * @param data RecycleViewItemData object will all the data
+     */
+
+    private void recyclerUpdateView(List<RecycleViewItemData> data){
+
+        RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
         RecycleViewItemData[] array = data.toArray(new RecycleViewItemData[data.size()]);
         RecycleViewAdapter rva = new RecycleViewAdapter(array, rv, this);
 
         rv.setAdapter(rva);
-        rv.setItemAnimator(new DefaultItemAnimator());
 
         //clean the data(necessary)
         data.clear();

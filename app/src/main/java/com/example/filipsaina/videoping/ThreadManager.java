@@ -21,8 +21,8 @@ public class ThreadManager extends Thread{
     private List<RecycleViewItemData> fullResponse = null;
     private String searchTerm;
 
-    public ThreadManager(String searchTerm){
-        this.searchTerm = searchTerm;
+    public ThreadManager(String searchTerml){
+        this.searchTerm = searchTerml;
     }
 
 

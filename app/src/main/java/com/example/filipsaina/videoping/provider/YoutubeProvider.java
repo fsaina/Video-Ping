@@ -30,7 +30,7 @@ public class YoutubeProvider implements Provider {
     private static final String PROVIDER_NAME = "Youtube";
     protected static final String YOUTUBE_API_KEY = "AIzaSyD0dkCKWmkzLIJJ0ALFokXlnq7e9n9epyo";
     private static final String APPLICATION_NAME = "Video ping";
-    private static final long LIMIT_RESULTS = 20;
+    private static final long LIMIT_RESULTS = 30;       //maximum number of elements per search
 
     private List<RecycleViewItemData> providerResult = new ArrayList<>();
 
@@ -85,7 +85,6 @@ public class YoutubeProvider implements Provider {
     public Fragment getPlayerFragment(String videoId) {
         return (Fragment) YoutubeVideoFragment.newInstance(videoId);
     }
-
 
     /*
     This method is used to transfer received data provided by the YouTube class

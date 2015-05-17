@@ -32,18 +32,19 @@
             <!--android:layout_above="@+id/recyclerView" />-->
 
 
-        <EditText
+        <AutoCompleteTextView
+            android:id="@+id/searchField"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="@string/search_field_initial_text"
-            android:ems="10"
-            android:id="@+id/searchField"
+            android:dropDownWidth="fill_parent"
+            android:dropDownHeight="wrap_content"
+            android:inputType="textNoSuggestions"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_toLeftOf="@+id/button"
-            android:layout_toStartOf="@+id/button" />
+            android:layout_toStartOf="@+id/button"
+            android:ems="10" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -51,7 +52,6 @@
             android:layout_height="wrap_content"
             android:text="Search"
             android:id="@+id/button"
-            android:onClick="onSearchButtonPressed"
             android:layout_alignTop="@+id/toolbar"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
