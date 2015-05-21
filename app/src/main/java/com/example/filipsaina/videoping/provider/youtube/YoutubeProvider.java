@@ -1,8 +1,8 @@
-package com.example.filipsaina.videoping.provider;
-
-import android.support.v4.app.Fragment;
+package com.example.filipsaina.videoping.provider.youtube;
 
 import com.example.filipsaina.videoping.RecycleViewItemData;
+import com.example.filipsaina.videoping.provider.Provider;
+import com.example.filipsaina.videoping.provider.ProviderList;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -30,9 +30,14 @@ public class YoutubeProvider implements Provider {
     private static final String PROVIDER_NAME = "Youtube";
     protected static final String YOUTUBE_API_KEY = "AIzaSyD0dkCKWmkzLIJJ0ALFokXlnq7e9n9epyo";
     private static final String APPLICATION_NAME = "Video ping";
-    private static final long LIMIT_RESULTS = 30;       //maximum number of elements per search
+    private static final long LIMIT_RESULTS = 50;       //maximum number of elements per search
+    private static final String PROVIDER_EMBED_URL_PREFIX = "http://www.youtube.com/embed/";
+    private static final String PROVIDER_EMBED_URL_SUFFIX = "?rel=0&amp;autoplay=1&showinfo=0&controls=0";
+    private static final String START_TIME_SUFFIX = "&start=";
 
     private List<RecycleViewItemData> providerResult = new ArrayList<>();
+
+
 
     /**
     Method required by the Provider interface.
@@ -65,7 +70,7 @@ public class YoutubeProvider implements Provider {
                 dataFormat(searchResultList.iterator());
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             //TODO check documentation for thrown exceptions for better exception handling
             e.printStackTrace();
         }
@@ -77,13 +82,20 @@ public class YoutubeProvider implements Provider {
         return PROVIDER_NAME;
     }
 
+
     /**
-    This is a necessary method that should provide the caller with Player Fragment element that
-    is capable of playing the video the service provides.
+     This is a necessary method that should provide the caller with the url link for the
+     WebView widget.
      */
+
     @Override
-    public Fragment getPlayerFragment(String videoId) {
-        return (Fragment) YoutubeVideoFragment.newInstance(videoId);
+    public String getFullVideoUrl(String videoId, String startTime) {
+        //TODO fix hardoded parts(webUrl)
+
+        String Url = "<html> <head> <style type=text/css> iframe {height:100%;width:100%;margin:0;padding:0;overflow:scroll;} body {background-color:#000; margin:0;}</style> </head> <body> <iframe width=240px height=220px src="
+                + PROVIDER_EMBED_URL_PREFIX + videoId + PROVIDER_EMBED_URL_SUFFIX + START_TIME_SUFFIX + startTime
+                + " frameborder=0 webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></body></html>";
+        return Url;
     }
 
     /*
@@ -97,6 +109,7 @@ public class YoutubeProvider implements Provider {
             SearchResult singleVideo = iteratorSearchResults.next();
             ResourceId rId = singleVideo.getId();
 
+
             // Confirm that the result represents a video. Otherwise, the
             // item will not contain a video ID.
             if (rId.getKind().equals("youtube#video")) {
@@ -105,7 +118,10 @@ public class YoutubeProvider implements Provider {
                         singleVideo.getSnippet().getTitle(),    // video title
                         thumbnail.getUrl(),                     // thumbnail URL
                         rId.getVideoId(),                       // video ID
-                        singleVideo.getSnippet().getDescription()));        //description of the video
+                        singleVideo.getSnippet().getDescription(), //description of the video
+                        null,                       // duration not implemented
+                        ProviderList.getCurrentProviderIndex()          //TODO fix duration request by youtube API
+                        ));
             }
         }
     }

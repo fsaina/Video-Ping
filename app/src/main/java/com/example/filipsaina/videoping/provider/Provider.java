@@ -1,7 +1,5 @@
 package com.example.filipsaina.videoping.provider;
 
-import android.support.v4.app.Fragment;
-
 import com.example.filipsaina.videoping.RecycleViewItemData;
 
 import java.util.List;
@@ -12,8 +10,8 @@ import java.util.List;
  */
 public interface Provider {
 
-    public List<RecycleViewItemData> fetchDataFromServer(String searchTerm);
     public String getProviderName();
-    public Fragment getPlayerFragment(final String videoId);
+    public List<RecycleViewItemData> fetchDataFromServer(String searchTerm);
+    public String getFullVideoUrl(String videoId, String startTime);
 
 }

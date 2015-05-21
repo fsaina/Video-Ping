@@ -1,91 +1,87 @@
 package com.example.filipsaina.videoping;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.widget.RelativeLayout;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.filipsaina.videoping.provider.YoutubeProvider;
+import com.example.filipsaina.videoping.provider.Provider;
+import com.example.filipsaina.videoping.provider.ProviderList;
 
 
 /**
 Activity that will be used to play video
  */
 
-public class PlayerActivity extends ActionBarActivity {
+public class PlayerActivity extends ActionBarActivity  {
+
+    private static float scale =0;
+    private boolean isPlaying = false;  //TODO fix this when autoplay is implemneted
 
     private RecycleViewItemData currentElement;
+    VideoWebViewPlayer videoPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+        scale = getResources().getDisplayMetrics().density;
 
-        //retrieve the data from the last activity
+        //retrieve the data from the selected data element
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String description = extras.getString("videoDescription");
             String videoTitle = extras.getString("videoTitle");
             String imageUrl = extras.getString("imageUrl");
             String videoId = extras.getString("videoId");
+            String duration = extras.getString("duration");
+            int providerIndex = extras.getInt("providerIndex");
 
-            currentElement = new RecycleViewItemData(videoTitle,imageUrl, videoId ,description);
+            currentElement = new RecycleViewItemData(videoTitle,imageUrl, videoId ,description, duration, providerIndex);
         }
 
 
-        //set visual elements
+        //set title
         TextView description = (TextView) findViewById(R.id.videoDescription);
         TextView title = (TextView) findViewById(R.id.title);
 
+        //set description
         description.setText(currentElement.getVideoDescription());
         title.setText(currentElement.getVideoTitle());
 
+        //TODO add video duration information
+        //get video provider from the element
+        Provider provider = ProviderList.getProviderWithIndex(currentElement.getProviderIndex());
 
-        //now populate key elements of our video player application
-        //by replacing finished elements in out layout
+        //set the videoPlayer element
+        videoPlayer = (VideoWebViewPlayer) findViewById(R.id.webPlayer);
+        videoPlayer.playVideo(provider, currentElement.getVideoId());
+    }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    public void onPlayPauseButtonPressed(View v){
+        Button playPause = (Button) findViewById(R.id.playPause);
+        if(isPlaying) {
+            playPause.setBackgroundResource(R.drawable.play);
+        }else{
+            playPause.setBackgroundResource(R.drawable.pause);
+        }
 
-        //TODO for simplicity Im just using the Youtube service, here should be added
-        //(based on 'currentElement') selection of Services that will call getPlayerFragment
-        YoutubeProvider yp = new YoutubeProvider();
-        Fragment player = yp.getPlayerFragment(currentElement.getVideoId());
+        isPlaying = !isPlaying;
+        VideoWebViewPlayer.emulateClick(videoPlayer, 0);
+    }
 
-        RelativeLayout playerSpace = (RelativeLayout) findViewById(R.id.player);
-        fragmentTransaction.add(playerSpace.getId(), player, "something").commit();     //TODO check documentation about this "something"
-
+    public void onJumpButtonPressed(View v) {
+        EditText seekField = (EditText) findViewById(R.id.seekField);
+        videoPlayer.seekTo(seekField.getText().toString());
     }
 
     @Override
     public void onBackPressed() {
+        videoPlayer.loadUrl("");    //small hack to stop the video
         finish();
         overridePendingTransition(R.anim.left_to_right_enter_element, R.anim.left_to_right_exit_element);
     }
 
-    //TODO implement this stuff
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_player, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 }

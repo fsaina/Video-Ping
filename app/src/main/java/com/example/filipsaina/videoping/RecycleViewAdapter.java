@@ -9,10 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.ImageOptions;
+import com.example.filipsaina.videoping.provider.ProviderList;
 
 
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder>{
@@ -30,26 +33,29 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     @Override
     public RecycleViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_item_view, parent, false);
+        final View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_item_view, parent, false);
 
         //add a listener to a item
         itemLayoutView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(AnimationUtils.loadAnimation(home, R.anim.on_recycle_view_item_click_animation));
+
                 int itemPosition = rv.getChildPosition(v);
                 RecycleViewItemData element = dataItems[itemPosition];
 
-                Intent intent = new Intent(home,PlayerActivity.class);
+                Intent intent = new Intent(home, PlayerActivity.class);
                 intent.putExtra("videoTitle", element.getVideoTitle());
                 intent.putExtra("videoDescription", element.getVideoDescription());
                 intent.putExtra("imageUrl", element.getImageURL());
                 intent.putExtra("videoId", element.getVideoId());
+                intent.putExtra("duration", element.getDuration());
+                intent.putExtra("providerIndex", ProviderList.getCurrentProviderIndex());
 
                 home.startActivity(intent);
                 home.overridePendingTransition(R.anim.right_to_left_enter_element, R.anim.right_to_left_exit_element);
             }
         });
-
         // create ViewHolder and return it
         return new ViewHolder(itemLayoutView);
     }
@@ -66,11 +72,17 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         //set Textual widgets
         viewHolder.txtViewTitle.setText(element.getVideoTitle());
         viewHolder.txtViewDescription.setText(element.getVideoDescription());
+        if(viewHolder.duration != null) viewHolder.duration.setText(element.getDuration());
 
         //set Images(Thumbnails)
-        //TODO check AQuery doc, example code (prefferably add some animations, better image caching)
         AQuery aq = new AQuery(viewHolder.imgViewIcon);
-        aq.id(viewHolder.imgViewIcon.getId()).image(dataItems[i].getImageURL(), true, true);
+        //round the corners of the images
+        ImageOptions options = new ImageOptions();
+        options.round = 15;
+        options.animation = AQuery.FADE_IN;
+        options.memCache = true;
+        options.fileCache = true;
+        aq.id(viewHolder.imgViewIcon.getId()).image(dataItems[i].getImageURL(),options);
 
     }
 
@@ -85,6 +97,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
         public TextView txtViewTitle;
         public TextView txtViewDescription;
+        public TextView duration;
         public ImageView imgViewIcon;
 
         public ViewHolder(View itemLayoutView) {
@@ -92,6 +105,9 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
             txtViewTitle = (TextView) itemLayoutView.findViewById(R.id.item_title);
             txtViewDescription = (TextView) itemLayoutView.findViewById(R.id.item_description);
             imgViewIcon = (ImageView) itemLayoutView.findViewById(R.id.item_icon);
+            //duration is specific
+            if(duration != null)duration = (TextView) itemLayoutView.findViewById(R.id.duration);
+            else itemLayoutView.findViewById(R.id.duration).setVisibility(View.INVISIBLE);
         }
     }
 
