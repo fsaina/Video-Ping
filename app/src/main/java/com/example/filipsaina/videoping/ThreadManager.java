@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-/**
+/*
+ * The idea behind threadManager class is to provide a simple way to manage threads(or operation if the ThreadManager thread does everything).
+ * As long as Listeners agree to the 'ThreadCompleteListener' interface and implement the methods inside in the UI thread, this thread will
+ * succeed in notifying of job completion
  * Created by filipsaina on 15/05/15.
- * The idea behing threadManager class is to provide a simple way to manage threads(or operation if the ThreadManaer thread does everything).
- * As long as Listeners agree to the 'ThreadCompleteListener' interaface and implement the methods inside in the UI thread, this thread will
- * suceed in notifying of job completion
  */
 public class ThreadManager extends Thread{
 
@@ -35,25 +35,23 @@ public class ThreadManager extends Thread{
     }
 
     private void notifyListener(){
-        this.listener.notifyOfThreadComplete(fullResponse);     //TODO insted of 'this', maybe we could deliver the data
+        this.listener.notifyOfThreadComplete(fullResponse);
     }
 
     @Override
     public void run() {
-        Looper.prepare();       //necessary
+        Looper.prepare();       //necessary -> (may cause exceptions on some Android devices)
         try{
 
             for(Provider provider: jobs){
                 List<RecycleViewItemData> response = provider.fetchDataFromServer(searchTerm);
                 if(response != null){
-                    fullResponse = response;    //TODO make a list within a list to store responses from other providers
+                    fullResponse = response;
                 }
             }
 
         }finally {
-            notifyListener();         //  <<==== should pass data
+            notifyListener();
         }
     }
-
-
 }

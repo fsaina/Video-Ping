@@ -1,5 +1,8 @@
 package com.example.filipsaina.videoping;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.example.filipsaina.videoping.provider.Provider;
 import com.example.filipsaina.videoping.provider.ProviderList;
@@ -24,7 +28,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 
 /**
-Initaial class Activity
+Initial class Activity for the application
  */
 
 public class HomeActivity extends ActionBarActivity implements ThreadCompleteListener {
@@ -51,8 +55,8 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
     //TODO onFocusLost for the searchView component(ditch the keyboard when the used decides to scroll in the midddle of typingd)
 
-    //this method is called everythime a dispached thread completed its task
-    //in this implementation there is just one Thread
+    //this method is called every time a dispatched thread completed its task
+    //so it is notifying the caller thread of its completion
     @Override
     public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
             runOnUiThread(new Runnable() {
@@ -61,16 +65,20 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
                     //update the RecyclerView
                     recyclerUpdateView(data);
 
-                    //end animation
+                    //end loading progress animation
                     SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
                     progressBar.setVisibility(View.INVISIBLE);
                 }
             });
-
     }
 
     //new threads are dispatched and the UI thread awaits for results
     public void onSearchPerform(String searchTerm){
+        //in case there is no internet connection - show a message
+        if(!haveNetworkConnection()){
+            Toast.makeText(this,getString(R.string.NoInternetConnectionMessage), Toast.LENGTH_SHORT).show();
+            return;
+        }
         ThreadManager tm = new ThreadManager(searchTerm);
         tm.addListener(this);
 
@@ -119,7 +127,7 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
     }
 
     /*
-    Set up the drawer troughout the application and all its elements
+    Set up the drawer trough out the application and all its elements
      */
     private void drawerSetup() {
         //TODO add to the drawer a title saying something like "Select video service provider:"
@@ -144,7 +152,6 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
     //method used to change the open/close state of the drawer
     //used as an onClick call
-    //should be used in case an menu button is added to the toolbar widget
     private void drawerChangeState(){
         if(drawer.isDrawerOpen()){
             drawer.closeDrawer();
@@ -155,14 +162,17 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
     @Override
     public void onBackPressed() {
-        if(drawer.isDrawerOpen()){
+        if (drawer.isDrawerOpen()) {
             //id the drawer is open - close if first(but don't exit the app)
             drawerChangeState();
-        }else {
+        } else {
             super.onBackPressed();
         }
     }
 
+    /*
+
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -184,6 +194,7 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
                 return true;
             }
         });
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -200,6 +211,27 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /*
+        Method used for checking if there is an active Internet connection on the
+        mobile device (wifi ar mobile)
+         */
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
 }

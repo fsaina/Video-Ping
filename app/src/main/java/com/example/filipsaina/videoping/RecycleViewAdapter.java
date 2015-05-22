@@ -1,6 +1,7 @@
 package com.example.filipsaina.videoping;
 
 /**
+ * Adapter definition for the RecyclerView
  * Created by filipsaina on 15/05/15.
  */
 

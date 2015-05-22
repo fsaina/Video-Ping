@@ -60,6 +60,9 @@ public class PlayerActivity extends ActionBarActivity  {
         videoPlayer.playVideo(provider, currentElement.getVideoId());
     }
 
+    /*
+    Define the button press operation for the Play/Pause button
+     */
     public void onPlayPauseButtonPressed(View v){
         Button playPause = (Button) findViewById(R.id.playPause);
         if(isPlaying) {
@@ -72,6 +75,9 @@ public class PlayerActivity extends ActionBarActivity  {
         VideoWebViewPlayer.emulateClick(videoPlayer, 0);
     }
 
+    /*
+    Define the button press operation for the Jump button
+     */
     public void onJumpButtonPressed(View v) {
         EditText seekField = (EditText) findViewById(R.id.seekField);
         videoPlayer.seekTo(seekField.getText().toString());

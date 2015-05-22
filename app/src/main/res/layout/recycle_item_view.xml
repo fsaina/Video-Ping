@@ -38,7 +38,7 @@
         android:enabled="true"
         android:text="item_title"
         android:gravity="center_vertical|left"
-        android:paddingLeft="10dp"
+        android:paddingLeft="5dp"
         android:paddingRight="10dp"
         android:textIsSelectable="false"
         android:layout_alignParentRight="true"
@@ -55,11 +55,12 @@
         android:layout_below="@+id/item_title"
         android:layout_alignLeft="@+id/item_title"
         android:layout_alignStart="@+id/item_title"
-        android:paddingLeft="10dp"
+        android:paddingLeft="5dp"
         android:textSize="9sp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/item_icon" />
+        android:layout_alignBottom="@+id/item_icon"
+        android:paddingRight="10dp" />
 
     <TextView
         android:layout_width="wrap_content"

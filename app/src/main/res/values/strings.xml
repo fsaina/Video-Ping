@@ -6,5 +6,6 @@
     <string name="drawer_item_settings">This are the settings</string>
     <string name="title_activity_player">PlayerActivity</string>
     <string name="search_field_initial_text">Search</string>
+    <string name="NoInternetConnectionMessage">You are not currently connected to the internet, please connect via mobile or wifi</string>
 
 </resources>

@@ -15,6 +15,8 @@ import android.widget.ProgressBar;
 import com.example.filipsaina.videoping.provider.Provider;
 
 /**
+ * Personal implementation of the Android provided WebView that is better suited
+ * for the applications usage as a video content player.
  * Created by filipsaina on 21/05/15.
  */
 public class VideoWebViewPlayer extends WebView {
@@ -38,6 +40,7 @@ public class VideoWebViewPlayer extends WebView {
         playerConstructor();
     }
 
+    //defining basic properties
     private void playerConstructor(){
         //setup the player
         playerSettings =  this.getSettings();
@@ -63,18 +66,25 @@ public class VideoWebViewPlayer extends WebView {
                 return pb;
             }
         });
-
         this.setWebViewClient(new WebViewClient() {
             /*
             When the webPage loads the page, simulate a user press(a bad workaround)
             so the player would start playing the video
              */
             public void onPageFinished(WebView view, String url) {
+                //guaranteed to autostart the video
                 emulateClick(view, 0);
             }
         });
     }
 
+    /**
+     * Method used for loading content to a VideoWebPayer class.
+     It is necessary that the referred Provider classes implements the necessary
+     methods and the videoId is provided via service API
+     * @param provider class that fully implements the Provider interface
+     * @param videoId String object that was provided by the given provider API
+     */
     public void playVideo(Provider provider, String videoId){
         this.provider = provider;
         this.videoId = videoId;
@@ -82,11 +92,21 @@ public class VideoWebViewPlayer extends WebView {
         this.loadDataWithBaseURL(null, provider.getFullVideoUrl(videoId, "0"), "text/html", "utf-8", null);
     }
 
+    /**
+     * Used for jumping to given postions trught-out the video content
+     * @param startSecond
+     */
+    //TODO implement video duration exceptins(too big seekTo, or negative)
     public void seekTo(String startSecond){
         //start from the second >time<
         this.loadDataWithBaseURL(null, provider.getFullVideoUrl(videoId, startSecond),"text/html", "utf-8", null);
     }
 
+    /*
+    Workaround for the play pause functionality for the video player
+    Another way to do such a thing would be to call onPause onResume
+    on hidden WebView threads (this is implementable)
+     */
     public static void emulateClick(final WebView webview, long delay) {
         long downTime = SystemClock.uptimeMillis();
 
