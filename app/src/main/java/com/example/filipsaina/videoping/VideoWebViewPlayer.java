@@ -21,6 +21,8 @@ import com.example.filipsaina.videoping.provider.Provider;
  */
 public class VideoWebViewPlayer extends WebView {
 
+    private static final boolean AUTOSTART_PLAYER = true;
+
     private WebSettings playerSettings;
     private Provider provider;
     private String videoId;
@@ -51,7 +53,7 @@ public class VideoWebViewPlayer extends WebView {
         playerSettings.setAppCacheEnabled(true);
         playerSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         if (Build.VERSION.SDK_INT >= 17) {
-            //this enables autoplay
+            //this enables autoplay on some devices
             playerSettings.setMediaPlaybackRequiresUserGesture(true);
         }
         this.setScrollbarFadingEnabled(true);
@@ -72,11 +74,14 @@ public class VideoWebViewPlayer extends WebView {
             so the player would start playing the video
              */
             public void onPageFinished(WebView view, String url) {
-                //guaranteed to autostart the video
-                emulateClick(view, 0);
+                if (AUTOSTART_PLAYER) {
+                    //fake a user click on the webView
+                    emulateClick(view, 0);
+                }
             }
         });
     }
+
 
     /**
      * Method used for loading content to a VideoWebPayer class.
@@ -93,10 +98,9 @@ public class VideoWebViewPlayer extends WebView {
     }
 
     /**
-     * Used for jumping to given postions trught-out the video content
-     * @param startSecond
+     * Used for jumping to given positions trough-out the video content
+     * @param startSecond positive numeric value defining the start second
      */
-    //TODO implement video duration exceptins(too big seekTo, or negative)
     public void seekTo(String startSecond){
         //start from the second >time<
         this.loadDataWithBaseURL(null, provider.getFullVideoUrl(videoId, startSecond),"text/html", "utf-8", null);
@@ -104,7 +108,7 @@ public class VideoWebViewPlayer extends WebView {
 
     /*
     Workaround for the play pause functionality for the video player
-    Another way to do such a thing would be to call onPause onResume
+    Another way to provide the same feature would be to call onPause onResume
     on hidden WebView threads (this is implementable)
      */
     public static void emulateClick(final WebView webview, long delay) {
@@ -119,18 +123,14 @@ public class VideoWebViewPlayer extends WebView {
         Runnable tapdown = new Runnable() {
             @Override
             public void run() {
-                if (webview != null) {
                     webview.dispatchTouchEvent(motionEvent);
-                }
             }
         };
 
         Runnable tapup = new Runnable() {
             @Override
             public void run() {
-                if (webview != null) {
                     webview.dispatchTouchEvent(motionEvent2);
-                }
             }
         };
         webview.postDelayed(tapdown, 0);

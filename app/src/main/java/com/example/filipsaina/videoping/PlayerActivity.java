@@ -1,7 +1,11 @@
 package com.example.filipsaina.videoping;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,19 +19,20 @@ import com.example.filipsaina.videoping.provider.ProviderList;
 Activity that will be used to play video
  */
 
-public class PlayerActivity extends ActionBarActivity  {
+public class PlayerActivity extends AppCompatActivity {
 
-    private static float scale =0;
-    private boolean isPlaying = false;  //TODO fix this when autoplay is implemneted
+    private boolean isPlaying = true;
 
     private RecycleViewItemData currentElement;
-    VideoWebViewPlayer videoPlayer;
+    private VideoWebViewPlayer videoPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
-        scale = getResources().getDisplayMetrics().density;
+
+        //define on screen off behaviour (pause the reproduction)
+        onScreenChangeStateSetup();
 
         //retrieve the data from the selected data element
         Bundle extras = getIntent().getExtras();
@@ -36,12 +41,10 @@ public class PlayerActivity extends ActionBarActivity  {
             String videoTitle = extras.getString("videoTitle");
             String imageUrl = extras.getString("imageUrl");
             String videoId = extras.getString("videoId");
-            String duration = extras.getString("duration");
             int providerIndex = extras.getInt("providerIndex");
 
-            currentElement = new RecycleViewItemData(videoTitle,imageUrl, videoId ,description, duration, providerIndex);
+            currentElement = new RecycleViewItemData(videoTitle,imageUrl, videoId ,description,providerIndex);
         }
-
 
         //set title
         TextView description = (TextView) findViewById(R.id.videoDescription);
@@ -51,13 +54,25 @@ public class PlayerActivity extends ActionBarActivity  {
         description.setText(currentElement.getVideoDescription());
         title.setText(currentElement.getVideoTitle());
 
-        //TODO add video duration information
         //get video provider from the element
         Provider provider = ProviderList.getProviderWithIndex(currentElement.getProviderIndex());
 
         //set the videoPlayer element
         videoPlayer = (VideoWebViewPlayer) findViewById(R.id.webPlayer);
         videoPlayer.playVideo(provider, currentElement.getVideoId());
+    }
+
+    private void onScreenChangeStateSetup() {
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                    if(isPlaying) onPlayPauseButtonPressed(null);
+                }
+            }
+        }, intentFilter);
     }
 
     /*
@@ -83,11 +98,15 @@ public class PlayerActivity extends ActionBarActivity  {
         videoPlayer.seekTo(seekField.getText().toString());
     }
 
+    /*
+    In order to stop the video execution, before killing the Activity we
+    load a blank page onto the webView.
+    webView thread lives on even after the activity is gone
+     */
     @Override
     public void onBackPressed() {
         videoPlayer.loadUrl("");    //small hack to stop the video
         finish();
         overridePendingTransition(R.anim.left_to_right_enter_element, R.anim.left_to_right_exit_element);
     }
-
 }

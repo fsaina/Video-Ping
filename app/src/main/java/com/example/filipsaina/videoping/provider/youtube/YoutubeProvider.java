@@ -37,12 +37,11 @@ public class YoutubeProvider implements Provider {
 
     private List<RecycleViewItemData> providerResult = new ArrayList<>();
 
-
-
     /**
     Method required by the Provider interface.
     All data fetching, internal client object initialization and manipulation should be
     done here, as for data grabbing and formatting.
+     @param searchTerm represents what request will be send to the provider
      */
     @Override
     public List<RecycleViewItemData> fetchDataFromServer(String searchTerm) {
@@ -71,7 +70,6 @@ public class YoutubeProvider implements Provider {
             }
 
         } catch (IOException e) {
-            //TODO check documentation for thrown exceptions for better exception handling
             e.printStackTrace();
         }
         return providerResult;
@@ -87,10 +85,8 @@ public class YoutubeProvider implements Provider {
      This is a necessary method that should provide the caller with the url link for the
      WebView widget.
      */
-
     @Override
     public String getFullVideoUrl(String videoId, String startTime) {
-        //TODO fix hardoded parts(webUrl)
 
         String Url = "<html> <head> <style type=text/css> iframe {height:100%;width:100%;margin:0;padding:0;overflow:scroll;} body {background-color:#000; margin:0;}</style> </head> <body> <iframe width=240px height=220px src="
                 + PROVIDER_EMBED_URL_PREFIX + videoId + PROVIDER_EMBED_URL_SUFFIX + START_TIME_SUFFIX + startTime
@@ -119,8 +115,7 @@ public class YoutubeProvider implements Provider {
                         thumbnail.getUrl(),                     // thumbnail URL
                         rId.getVideoId(),                       // video ID
                         singleVideo.getSnippet().getDescription(), //description of the video
-                        null,                       // duration not implemented
-                        ProviderList.getCurrentProviderIndex()          //TODO fix duration request by youtube API
+                        ProviderList.getCurrentProviderIndex()
                         ));
             }
         }

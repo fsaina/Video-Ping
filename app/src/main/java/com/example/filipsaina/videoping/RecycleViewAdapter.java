@@ -18,7 +18,6 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.ImageOptions;
 import com.example.filipsaina.videoping.provider.ProviderList;
 
-
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder>{
 
     private RecycleViewItemData[] dataItems;
@@ -50,8 +49,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
                 intent.putExtra("videoDescription", element.getVideoDescription());
                 intent.putExtra("imageUrl", element.getImageURL());
                 intent.putExtra("videoId", element.getVideoId());
-                intent.putExtra("duration", element.getDuration());
-                intent.putExtra("providerIndex", ProviderList.getCurrentProviderIndex());
+                intent.putExtra("providerIndex", element.getProviderIndex());
 
                 home.startActivity(intent);
                 home.overridePendingTransition(R.anim.right_to_left_enter_element, R.anim.right_to_left_exit_element);
@@ -73,18 +71,17 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         //set Textual widgets
         viewHolder.txtViewTitle.setText(element.getVideoTitle());
         viewHolder.txtViewDescription.setText(element.getVideoDescription());
-        if(viewHolder.duration != null) viewHolder.duration.setText(element.getDuration());
+        viewHolder.providerName.setText(ProviderList.getProviderName(element.getProviderIndex()));
 
         //set Images(Thumbnails)
         AQuery aq = new AQuery(viewHolder.imgViewIcon);
-        //round the corners of the images
+        //round the corners of the images and define other image parameters
         ImageOptions options = new ImageOptions();
         options.round = 15;
         options.animation = AQuery.FADE_IN;
         options.memCache = true;
         options.fileCache = true;
         aq.id(viewHolder.imgViewIcon.getId()).image(dataItems[i].getImageURL(),options);
-
     }
 
     //return the number of elements inside the recycleView
@@ -98,7 +95,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
         public TextView txtViewTitle;
         public TextView txtViewDescription;
-        public TextView duration;
+        public TextView providerName;
         public ImageView imgViewIcon;
 
         public ViewHolder(View itemLayoutView) {
@@ -106,10 +103,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
             txtViewTitle = (TextView) itemLayoutView.findViewById(R.id.item_title);
             txtViewDescription = (TextView) itemLayoutView.findViewById(R.id.item_description);
             imgViewIcon = (ImageView) itemLayoutView.findViewById(R.id.item_icon);
-            //duration is specific
-            if(duration != null)duration = (TextView) itemLayoutView.findViewById(R.id.duration);
-            else itemLayoutView.findViewById(R.id.duration).setVisibility(View.INVISIBLE);
+            providerName = (TextView) itemLayoutView.findViewById(R.id.providerName);
         }
     }
-
 }

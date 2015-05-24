@@ -14,7 +14,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:id="@+id/playerContainer"
-        android:layout_height="400dp">
+        android:layout_height="350dp">
 
         <com.example.filipsaina.videoping.VideoWebViewPlayer
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#ff464646"
-        android:text="title"
+        android:text="Dummy title"
         android:id="@+id/title"
         android:paddingLeft="15dp"
         android:paddingRight="15dp" />
@@ -51,60 +51,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="videoDescription"
-            android:textColor="#ff9a9a9a"
-            android:id="@+id/videoDescription"
-            android:layout_alignParentTop="true"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:layout_above="@+id/relativeLayout" />
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollView"
+            android:layout_above="@+id/relativeLayout"
+            android:layout_alignParentTop="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Dummy description"
+                android:textColor="#ff9a9a9a"
+                android:id="@+id/videoDescription"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:layout_above="@+id/relativeLayout" />
+        </ScrollView>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:id="@+id/relativeLayout">
+            android:id="@+id/relativeLayout"
+            android:background="#2196F3">
 
             <Button
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:onClick="onPlayPauseButtonPressed"
                 android:id="@+id/playPause"
-                android:background="@drawable/play"
+                android:background="@drawable/pause"
                 android:gravity="center"
-                android:layout_marginLeft="48dp"
-                android:layout_marginStart="48dp"
+                android:layout_marginLeft="14dp"
+                android:layout_centerVertical="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignTop="@+id/seekTo" />
+                android:layout_marginStart="14dp" />
 
             <Button
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:onClick="onJumpButtonPressed"
                 android:id="@+id/seekTo"
                 android:layout_gravity="right"
                 android:background="@drawable/fast_forward"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignTop="@+id/playPause"
+                android:layout_toRightOf="@+id/playPause"
+                android:layout_toEndOf="@+id/playPause"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="14dp" />
 
             <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:ems="3"
+                android:digits="0123456789"
                 android:id="@+id/seekField"
-                android:layout_marginRight="48dp"
-                android:layout_marginEnd="48dp"
+                android:textColor="@android:color/white"
+                android:gravity="center"
+                android:ems="4"
+                android:layout_marginRight="37dp"
+                android:layout_marginEnd="37dp"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/seekTo"
-                android:layout_toStartOf="@+id/seekTo" />
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Seek to:  "
+                android:id="@+id/textView"
+                android:layout_alignBottom="@+id/seekField"
+                android:layout_toLeftOf="@+id/seekField"
+                android:layout_toStartOf="@+id/seekField"
+                android:layout_alignTop="@+id/seekField"
+                android:gravity="center_vertical|center_horizontal" />
         </RelativeLayout>
 
     </RelativeLayout>

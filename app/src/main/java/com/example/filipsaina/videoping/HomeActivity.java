@@ -4,22 +4,24 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.filipsaina.videoping.provider.Provider;
 import com.example.filipsaina.videoping.provider.ProviderList;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.List;
@@ -31,7 +33,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 Initial class Activity for the application
  */
 
-public class HomeActivity extends ActionBarActivity implements ThreadCompleteListener {
+public class HomeActivity extends AppCompatActivity implements ThreadCompleteListener {
 
     //drawer reference(on drawerSetup)
     private Drawer.Result drawer = null;
@@ -40,36 +42,26 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
 
-        //recycleView setup
+        //give the new appCompat v21 toolbar widget properties of a actionBar
+        actionBarSetup();
+
+        //define the looks and properties
         recyclerViewSetup();
 
-        //drawer setup
+        //populate with elements
         drawerSetup();
 
-        //initial Search
+        //initial search for avoiding a blank screen
         onSearchPerform("");
     }
 
-    //TODO onFocusLost for the searchView component(ditch the keyboard when the used decides to scroll in the midddle of typingd)
-
-    //this method is called every time a dispatched thread completed its task
-    //so it is notifying the caller thread of its completion
-    @Override
-    public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //update the RecyclerView
-                    recyclerUpdateView(data);
-
-                    //end loading progress animation
-                    SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
-                    progressBar.setVisibility(View.INVISIBLE);
-                }
-            });
+    private void actionBarSetup() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(getResources().getDrawable(R.drawable.menu_icon));
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     //new threads are dispatched and the UI thread awaits for results
@@ -83,7 +75,7 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
         tm.addListener(this);
 
         //apply the current provider for data grabbing from the Internet
-        //>>on the slected Provider class will be done the >fetchDataFromServer< method
+        //>>on the selected Provider class will be done the >fetchDataFromServer< method
         Provider selectedProvider = ProviderList.getCurrentProvider();
         tm.addProvider(selectedProvider);
 
@@ -92,6 +84,28 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
         progressBar.setVisibility(View.VISIBLE);
 
         tm.start();
+    }
+
+    //this method is called every time a dispatched thread completed its task
+    //so it is notifying the caller thread of its completion
+    @Override
+    public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
+        final Context contextReference = this.getApplicationContext();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (data.size() > 0) {
+                    //update the RecyclerView
+                    recyclerUpdateView(data);
+                } else {
+                    Toast.makeText(contextReference, getString(R.string.NoMatchFoundMessage), Toast.LENGTH_SHORT).show();
+                }
+
+                //end loading progress animation
+                SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     /*
@@ -111,9 +125,8 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
      * Method used to update the recycleView with all its elements.
      Method is invoked with the 'data' parameter that consists of RecycleViewItemData objects
      which will populate the widget
-     * @param data RecycleViewItemData object will all the data
+     * @param data RecycleViewItemData object with all the data
      */
-
     private void recyclerUpdateView(List<RecycleViewItemData> data){
 
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerView);
@@ -130,7 +143,6 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
     Set up the drawer trough out the application and all its elements
      */
     private void drawerSetup() {
-        //TODO add to the drawer a title saying something like "Select video service provider:"
         //for more details
         //https://github.com/mikepenz/MaterialDrawer
         Drawer.Result result = new Drawer()
@@ -139,14 +151,16 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
                         ProviderList.setCurrentProviderIndex(position);
-                        onSearchPerform("");
                     }
                 })
                 .build();
 
+        //add all the providers to the drawer
         for(Provider provider: ProviderList.getListOfAllProviders()){
             result.addItem(new PrimaryDrawerItem().withName(provider.getProviderName()));
         }
+        //add the divider at the end(with a description)
+        result.addItem(new SectionDrawerItem().withName(getString(R.string.DrawerTitleMessage)));
         this.drawer = result;
     }
 
@@ -171,16 +185,19 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
     }
 
     /*
-
+    Populate the options menu with items defined in <menu_home.xml>
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        SearchView search=(SearchView) findViewById(R.id.search_view);
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_home, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
 
         //set the text functions of the search_view component
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 onSearchPerform(query);
@@ -190,23 +207,21 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
             @Override
             public boolean onQueryTextChange(String newText) {
                 //do nothing
-                //optimally here shound be some 'showSuggestions' call implemented
+                //optimally here should be some 'showSuggestions' method call implemented
                 return true;
             }
         });
-
         return super.onCreateOptionsMenu(menu);
     }
 
+    /*
+    Give functionality to the menu item(home button)
+     */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
             drawerChangeState();
             return true;
         }
@@ -215,7 +230,7 @@ public class HomeActivity extends ActionBarActivity implements ThreadCompleteLis
 
     /*
         Method used for checking if there is an active Internet connection on the
-        mobile device (wifi ar mobile)
+        mobile device (wifi or mobile)
          */
     private boolean haveNetworkConnection() {
         boolean haveConnectedWifi = false;
