@@ -82,7 +82,6 @@ public class VideoWebViewPlayer extends WebView {
         });
     }
 
-
     /**
      * Method used for loading content to a VideoWebPayer class.
      It is necessary that the referred Provider classes implements the necessary
@@ -93,7 +92,7 @@ public class VideoWebViewPlayer extends WebView {
     public void playVideo(Provider provider, String videoId){
         this.provider = provider;
         this.videoId = videoId;
-        //start from the start
+        //start video from the beginning
         this.loadDataWithBaseURL(null, provider.getFullVideoUrl(videoId, "0"), "text/html", "utf-8", null);
     }
 
