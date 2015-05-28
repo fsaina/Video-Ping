@@ -100,8 +100,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     /*
     In order to stop the video execution, before killing the Activity we
-    load a blank page onto the webView.
-    webView thread lives on even after the activity is gone
+    load a blank page onto the webView. To stop the reproduction.
      */
     @Override
     public void onBackPressed() {

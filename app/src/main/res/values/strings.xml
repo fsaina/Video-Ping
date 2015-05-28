@@ -6,7 +6,7 @@
     <string name="title_activity_player">PlayerActivity</string>
     <string name="NoInternetConnectionMessage">You are not currently connected to the Internet, please connect via mobile network or Wifi</string>
     <string name="NoMatchFoundMessage">Sorry, there are no videos that match your search criteria</string>
-    <string name="DrawerTitleMessage">Select video service provider</string>
+    <string name="DrawerTitleMessage">Select a video service provider</string>
     <string name="MenuItemSearchText">Search</string>
     <string name="recycle_item_provider_name">provider</string>
 </resources>

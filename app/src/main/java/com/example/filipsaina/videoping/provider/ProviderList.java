@@ -17,13 +17,14 @@ import com.example.filipsaina.videoping.provider.youtube.YoutubeProvider;
     is not recommendable (may introduce unexpected application crashes due to Java garbage collector)
  */
 public class ProviderList {
-    private static int currentProviderIndex =0;        //by default it is 0 (Youtube)
 
-    //Every new provider needs to be included in this list(and just this one)
+    //Every new provider needs to be included in this list
     private static Provider[] listOfAllProviders = {
-            new YoutubeProvider(),
+            new YoutubeProvider(),          //currentProviderIndex is currently set to Youtube(0)
             new DailymotionProvider()
     };
+
+    private static int currentProviderIndex =0;
 
     public static String getProviderName(int index){
         String name = "";
