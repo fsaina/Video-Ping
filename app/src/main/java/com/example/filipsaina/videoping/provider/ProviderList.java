@@ -1,5 +1,5 @@
 package com.example.filipsaina.videoping.provider;
-import com.example.filipsaina.videoping.provider.dailymotion.DailymotionProvider;
+import com.example.filipsaina.videoping.provider.dailymotion.DailymotionsProvider;
 import com.example.filipsaina.videoping.provider.youtube.YoutubeProvider;
 
 /**
@@ -21,7 +21,7 @@ public class ProviderList {
     //Every new provider needs to be included in this list
     private static Provider[] listOfAllProviders = {
             new YoutubeProvider(),          //currentProviderIndex is currently set to Youtube(0)
-            new DailymotionProvider()
+            new DailymotionsProvider()
     };
 
     private static int currentProviderIndex =0;
