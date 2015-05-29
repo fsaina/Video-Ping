@@ -91,7 +91,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     /*
-    Define the button press operation for the Jump button 
+    Define the button press operation for the Jump button
      */
     public void onJumpButtonPressed(View v) {
         EditText seekField = (EditText) findViewById(R.id.seekField);

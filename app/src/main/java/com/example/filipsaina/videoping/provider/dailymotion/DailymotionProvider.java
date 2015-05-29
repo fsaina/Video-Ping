@@ -22,7 +22,7 @@ import java.util.List;
  * Dailymotion provider Class
  * Created by filipsaina on 18/05/15.
  */
-public class DailymotionsProvider implements Provider {
+public class DailymotionProvider implements Provider {
 
     private static final String PROVIDER_NAME = "Dailymotion";
     private static final String PROVIDER_EMBED_URL_PREFIX = "http://www.dailymotion.com/embed/video/";
@@ -33,7 +33,7 @@ public class DailymotionsProvider implements Provider {
     @Override
     public List<RecycleViewItemData> fetchDataFromServer(String searchTerm) {
 
-        List<RecycleViewItemData> returnElements = new ArrayList<RecycleViewItemData>();
+        List<RecycleViewItemData> returnElements = new ArrayList<>();
 
         //preset json request
         //more information on >> https://developer.dailymotion.com/tools#/video
