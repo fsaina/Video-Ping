@@ -11,13 +11,15 @@ public class RecycleViewItemData {
     private String videoId;
     private String imageURL;
     private String videoDescription;
+    private int duration;
     private int providerIndex;
 
-    public RecycleViewItemData(String videoTitle, String imageURL, String videoId, String videoDescription, int providerIndex){
+    public RecycleViewItemData(String videoTitle, String imageURL, String videoId, String videoDescription,int duration, int providerIndex){
             this.videoTitle = videoTitle;
             this.imageURL = imageURL;
             this.videoId = videoId;
             this.videoDescription = videoDescription;
+            this.duration = duration;
             this.providerIndex = providerIndex;
     }
 
@@ -33,6 +35,7 @@ public class RecycleViewItemData {
     public String getVideoId(){
         return videoId;
     }
+    public int getDurationInSeconds(){ return duration; }
     public int getProviderIndex(){
         return providerIndex;
     }

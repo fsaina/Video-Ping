@@ -26,6 +26,7 @@ public class VideoWebViewPlayer extends WebView {
     private WebSettings playerSettings;
     private Provider provider;
     private String videoId;
+    private boolean stopPlayerTmp = false;
 
     public VideoWebViewPlayer(Context context) {
         super(context);
@@ -74,13 +75,15 @@ public class VideoWebViewPlayer extends WebView {
             so the player would start playing the video
              */
             public void onPageFinished(WebView view, String url) {
-                if (AUTOSTART_PLAYER) {
+                if (AUTOSTART_PLAYER & stopPlayerTmp == false) {
                     //fake a user click on the webView
                     emulateClick(view, 0);
                 }
+                stopPlayerTmp = false;
             }
         });
     }
+
 
     /**
      * Method used for loading content to a VideoWebPayer class.
@@ -103,6 +106,11 @@ public class VideoWebViewPlayer extends WebView {
     public void seekTo(String startSecond){
         //start from the second >time<
         this.loadDataWithBaseURL(null, provider.getFullVideoUrl(videoId, startSecond),"text/html", "utf-8", null);
+    }
+
+    public void stop(){
+        stopPlayerTmp = true;
+        seekTo("0");
     }
 
     /*

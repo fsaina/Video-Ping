@@ -14,14 +14,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.example.filipsaina.videoping.provider.Provider;
 import com.example.filipsaina.videoping.provider.ProviderList;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.List;
@@ -37,11 +36,14 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
 
     //drawer reference(on drawerSetup)
     private Drawer.Result drawer = null;
+    private List<RecycleViewItemData> data;
+    private HomeActivity root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        this.root = this;   //obtain a reference
 
         //give the new appCompat v21 toolbar widget properties of a actionBar
         actionBarSetup();
@@ -53,7 +55,7 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
         drawerSetup();
 
         //initial search for avoiding a blank screen
-        onSearchPerform("");
+        onSearchPerform(" ");
     }
 
     private void actionBarSetup() {
@@ -76,8 +78,18 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
 
         //apply the current provider for data grabbing from the Internet
         //>>on the selected Provider class will be done the >fetchDataFromServer< method
-        Provider selectedProvider = ProviderList.getCurrentProvider();
-        tm.addProvider(selectedProvider);
+//        Provider selectedProvider = ProviderList.getCurrentProvider();
+//        tm.addProvider(selectedProvider);
+        List<IDrawerItem> allDrawerItemrs = drawer.getDrawerItems();
+        for(IDrawerItem item: allDrawerItemrs){
+            if(item instanceof SwitchDrawerItem){
+                SwitchDrawerItem switchDrawerItem = (SwitchDrawerItem) item;
+                if(switchDrawerItem.isChecked()){
+                    Provider p = ProviderList.getProviderWithName(switchDrawerItem.getName());
+                    tm.addProvider(p);
+                }
+            }
+        }
 
         //start loading animation
         SmoothProgressBar progressBar = (SmoothProgressBar) findViewById(R.id.progressBar);
@@ -89,8 +101,9 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
     //this method is called every time a dispatched thread completed its task
     //so it is notifying the caller thread of its completion
     @Override
-    public void notifyOfThreadComplete(final List<RecycleViewItemData> data) {
-        final Context contextReference = this.getApplicationContext();
+    public void notifyOfThreadComplete(List<RecycleViewItemData> list) {
+        this.data = list;
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -98,7 +111,7 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
                     //update the RecyclerView
                     recyclerUpdateView(data);
                 } else {
-                    Toast.makeText(contextReference, getString(R.string.NoMatchFoundMessage), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(root, getString(R.string.NoMatchFoundMessage), Toast.LENGTH_SHORT).show();
                 }
 
                 //end loading progress animation
@@ -133,9 +146,10 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
         RecycleViewItemData[] array = data.toArray(new RecycleViewItemData[data.size()]);
         RecycleViewAdapter rva = new RecycleViewAdapter(array, rv, this);
 
+        rv.removeAllViews();
         rv.setAdapter(rva);
 
-        //clean the data(necessary)
+        this.data.clear();
         data.clear();
     }
 
@@ -147,17 +161,11 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
         //https://github.com/mikepenz/MaterialDrawer
         Drawer.Result result = new Drawer()
                 .withActivity(this)
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                        ProviderList.setCurrentProviderIndex(position);
-                    }
-                })
                 .build();
 
         //add all the providers to the drawer
         for(Provider provider: ProviderList.getListOfAllProviders()){
-            result.addItem(new PrimaryDrawerItem().withName(provider.getProviderName()));
+            result.addItem(new SwitchDrawerItem().withName(provider.getProviderName()).withChecked(true));
         }
         //add the divider at the end(with a description)
         result.addItem(new SectionDrawerItem().withName(getString(R.string.DrawerTitleMessage)));
@@ -248,5 +256,6 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+
 
 }

@@ -2,6 +2,7 @@ package com.example.filipsaina.videoping.provider;
 import com.example.filipsaina.videoping.provider.dailymotion.DailymotionProvider;
 import com.example.filipsaina.videoping.provider.youtube.YoutubeProvider;
 
+
 /**
  * Static class that holds the references to Objects that implemented the Provider interface.
  *      Important: Every Object that implements the Provider interface needs to be
@@ -20,13 +21,12 @@ public class ProviderList {
 
     //Every new provider needs to be included in this list
     private static Provider[] listOfAllProviders = {
-            new YoutubeProvider(),          //currentProviderIndex is currently set to Youtube(0)
+            new YoutubeProvider(),
             new DailymotionProvider()
     };
 
-    private static int currentProviderIndex =0;
 
-    public static String getProviderName(int index){
+    public static String getProviderNameWithIndex(int index){
         String name = "";
         try{
             name = listOfAllProviders[index].getProviderName();
@@ -38,17 +38,23 @@ public class ProviderList {
         return listOfAllProviders;
     }
 
-    public static int getCurrentProviderIndex(){ return currentProviderIndex; }
-
-    public static void setCurrentProviderIndex(int index){
-        currentProviderIndex = index;
+    public static Provider getProviderWithName(String name){
+        int index = getProviderIndexWithName(name);
+        return getProviderWithIndex(index);
     }
+
+    public static int getProviderIndexWithName(String keyName){
+        int i =0;
+        for(Provider p: listOfAllProviders){
+            if(p.getProviderName().equalsIgnoreCase(keyName)) break;
+            i++;
+        }
+        return i;
+    }
+
 
     public static Provider getProviderWithIndex(int i) throws ArrayIndexOutOfBoundsException{
         return listOfAllProviders[i];
     }
 
-    public static Provider getCurrentProvider(){
-        return listOfAllProviders[currentProviderIndex];
-    }
 }

@@ -18,6 +18,9 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.ImageOptions;
 import com.example.filipsaina.videoping.provider.ProviderList;
 
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder>{
 
     private RecycleViewItemData[] dataItems;
@@ -49,6 +52,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
                 intent.putExtra("videoDescription", element.getVideoDescription());
                 intent.putExtra("imageUrl", element.getImageURL());
                 intent.putExtra("videoId", element.getVideoId());
+                intent.putExtra("duration", element.getDurationInSeconds());
                 intent.putExtra("providerIndex", element.getProviderIndex());
 
                 home.startActivity(intent);
@@ -71,7 +75,8 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         //set Textual widgets
         viewHolder.txtViewTitle.setText(element.getVideoTitle());
         viewHolder.txtViewDescription.setText(element.getVideoDescription());
-        viewHolder.providerName.setText(ProviderList.getProviderName(element.getProviderIndex()));
+        viewHolder.providerName.setText(ProviderList.getProviderNameWithIndex(element.getProviderIndex()));
+        viewHolder.duration.setText(getFromatedTime(element.getDurationInSeconds()));
 
         //set Images(Thumbnails)
         AQuery aq = new AQuery(viewHolder.imgViewIcon);
@@ -90,6 +95,14 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         return dataItems.length;
     }
 
+    //method formats seconds to standard time (Joda-time)
+    public static String getFromatedTime(int seconds){
+        LocalTime time = new LocalTime(0, 0); // midnight
+        time = time.plusSeconds(seconds);
+        String output = DateTimeFormat.forPattern("mm:ss").print(time);
+        return output;
+    }
+
     // inner class to hold a reference to each item of RecyclerView
     public static class ViewHolder extends RecyclerView.ViewHolder  {
 
@@ -97,6 +110,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         public TextView txtViewDescription;
         public TextView providerName;
         public ImageView imgViewIcon;
+        public TextView duration;
 
         public ViewHolder(View itemLayoutView) {
             super(itemLayoutView);
@@ -104,6 +118,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
             txtViewDescription = (TextView) itemLayoutView.findViewById(R.id.item_description);
             imgViewIcon = (ImageView) itemLayoutView.findViewById(R.id.item_icon);
             providerName = (TextView) itemLayoutView.findViewById(R.id.providerName);
+            duration = (TextView) itemLayoutView.findViewById(R.id.duration);
         }
     }
 }

@@ -2,14 +2,21 @@ package com.example.filipsaina.videoping;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.filipsaina.videoping.provider.Provider;
 import com.example.filipsaina.videoping.provider.ProviderList;
@@ -41,9 +48,10 @@ public class PlayerActivity extends AppCompatActivity {
             String videoTitle = extras.getString("videoTitle");
             String imageUrl = extras.getString("imageUrl");
             String videoId = extras.getString("videoId");
+            int duration = extras.getInt("duration");
             int providerIndex = extras.getInt("providerIndex");
 
-            currentElement = new RecycleViewItemData(videoTitle,imageUrl, videoId ,description,providerIndex);
+            currentElement = new RecycleViewItemData(videoTitle,imageUrl, videoId ,description,duration,providerIndex);
         }
 
         //set title
@@ -53,6 +61,10 @@ public class PlayerActivity extends AppCompatActivity {
         //set description
         description.setText(currentElement.getVideoDescription());
         title.setText(currentElement.getVideoTitle());
+
+        //set duration
+        TextView duration = (TextView) findViewById(R.id.videoDuration);
+        duration.setText(RecycleViewAdapter.getFromatedTime(currentElement.getDurationInSeconds()));
 
         //get video provider from the element
         Provider provider = ProviderList.getProviderWithIndex(currentElement.getProviderIndex());
@@ -69,7 +81,7 @@ public class PlayerActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                    if(isPlaying) onPlayPauseButtonPressed(null);
+                    if (isPlaying) onPlayPauseButtonPressed(null);
                 }
             }
         }, intentFilter);
@@ -79,23 +91,59 @@ public class PlayerActivity extends AppCompatActivity {
     Define the button press operation for the Play/Pause button
      */
     public void onPlayPauseButtonPressed(View v){
+        changePlayPauseIcon();
+        VideoWebViewPlayer.emulateClick(videoPlayer, 0);
+    }
+
+    private void changePlayPauseIcon() {
         Button playPause = (Button) findViewById(R.id.playPause);
         if(isPlaying) {
             playPause.setBackgroundResource(R.drawable.play);
         }else{
             playPause.setBackgroundResource(R.drawable.pause);
         }
-
         isPlaying = !isPlaying;
-        VideoWebViewPlayer.emulateClick(videoPlayer, 0);
+    }
+
+    public void onStopButtonPressed(View v){
+        if(isPlaying) {
+            changePlayPauseIcon();
+        }
+        videoPlayer.stop();
     }
 
     /*
-    Define the button press operation for the Jump button
+    Show dialog and ask the user for input
      */
     public void onJumpButtonPressed(View v) {
-        EditText seekField = (EditText) findViewById(R.id.seekField);
-        videoPlayer.seekTo(seekField.getText().toString());
+
+        final EditText editText = new EditText(this);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        editText.setGravity(Gravity.CENTER);
+        editText.setTextColor(Color.WHITE);
+        editText.setMaxLines(1);
+        editText.setText("0");
+        editText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(6)});
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.jump_dialog_message_text))
+                .setMessage(null)       //no need for a description message
+                .setView(editText)
+                .setPositiveButton(getString(R.string.jump_dialog_confirm_button), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = editText.getText().toString();
+                        int numericalValue = Integer.parseInt(value);
+                        if(numericalValue > currentElement.getDurationInSeconds()){
+                            Toast.makeText(getApplicationContext(), getString(R.string.jump_dialog_onTooBigValueProvided),Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        if(isPlaying == false) changePlayPauseIcon();
+                        videoPlayer.seekTo(value);
+                    }
+                }).setNegativeButton(getString(R.string.jump_dialog_cancle_button), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Do nothing
+            }
+        }).show();
     }
 
     /*

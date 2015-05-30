@@ -6,7 +6,11 @@
     <string name="title_activity_player">PlayerActivity</string>
     <string name="NoInternetConnectionMessage">You are not currently connected to the Internet, please connect via mobile network or Wifi</string>
     <string name="NoMatchFoundMessage">Sorry, there are no videos that match your search criteria</string>
-    <string name="DrawerTitleMessage">Select a video service provider</string>
+    <string name="DrawerTitleMessage">Select video service providers</string>
     <string name="MenuItemSearchText">Search</string>
     <string name="recycle_item_provider_name">provider</string>
+    <string name="jump_dialog_cancle_button">Cancel</string>
+    <string name="jump_dialog_confirm_button">Jump</string>
+    <string name="jump_dialog_message_text">Jump to second:</string>
+    <string name="jump_dialog_onTooBigValueProvided">Provided value too big</string>
 </resources>

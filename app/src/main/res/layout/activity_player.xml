@@ -37,15 +37,37 @@
     </RelativeLayout>
 
 
-    <TextView
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#ff464646"
-        android:text="Dummy title"
-        android:id="@+id/title"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#ff464646"
+            android:text="Dummy title"
+            android:id="@+id/title"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="00:00"
+            android:minWidth="50dp"
+            android:id="@+id/videoDuration"
+            android:background="#96454545"
+            android:maxLines="1"
+            android:textSize="15sp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_alignRight="@+id/item_icon"
+            android:layout_alignEnd="@+id/item_icon"
+            android:gravity="center" />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -86,11 +108,8 @@
                 android:id="@+id/playPause"
                 android:background="@drawable/pause"
                 android:gravity="center"
-                android:layout_marginLeft="14dp"
                 android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="14dp" />
+                android:layout_centerHorizontal="true" />
 
             <Button
                 android:layout_width="60dp"
@@ -102,35 +121,22 @@
                 android:layout_alignTop="@+id/playPause"
                 android:layout_toRightOf="@+id/playPause"
                 android:layout_toEndOf="@+id/playPause"
-                android:layout_marginLeft="16dp"
+                android:layout_marginLeft="21dp"
                 android:layout_marginStart="14dp" />
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:digits="0123456789"
-                android:id="@+id/seekField"
-                android:textColor="@android:color/white"
-                android:gravity="center"
-                android:ems="4"
-                android:layout_marginRight="37dp"
-                android:layout_marginEnd="37dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
+            <Button
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:onClick="onStopButtonPressed"
+                android:id="@+id/stopButton"
+                android:layout_gravity="right"
+                android:background="@drawable/stop"
+                android:layout_alignTop="@+id/playPause"
+                android:layout_toLeftOf="@+id/playPause"
+                android:layout_toStartOf="@+id/playPause"
+                android:layout_marginRight="21dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Seek to:  "
-                android:id="@+id/textView"
-                android:layout_alignBottom="@+id/seekField"
-                android:layout_toLeftOf="@+id/seekField"
-                android:layout_toStartOf="@+id/seekField"
-                android:layout_alignTop="@+id/seekField"
-                android:gravity="center_vertical|center_horizontal" />
+
         </RelativeLayout>
 
     </RelativeLayout>

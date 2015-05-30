@@ -4,6 +4,7 @@ import android.os.Looper;
 
 import com.example.filipsaina.videoping.provider.Provider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -18,7 +19,7 @@ public class ThreadManager extends Thread{
 
     private ThreadCompleteListener listener = null;
     private Set<Provider> jobs = new CopyOnWriteArraySet<>();
-    private List<RecycleViewItemData> fullResponse = null;
+    private List<RecycleViewItemData> fullResponse = new ArrayList<>();
     private String searchTerm;
 
     public ThreadManager(String searchTerml){
@@ -46,8 +47,9 @@ public class ThreadManager extends Thread{
             for(Provider provider: jobs){
                 List<RecycleViewItemData> response = provider.fetchDataFromServer(searchTerm);
                 if(response != null){
-                    fullResponse = response;
+                    fullResponse.addAll(response);
                 }
+                response.clear();           //due to processor caching - explicitly perform clear
             }
 
         }finally {

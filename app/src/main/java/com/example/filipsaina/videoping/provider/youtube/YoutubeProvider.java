@@ -3,6 +3,7 @@ package com.example.filipsaina.videoping.provider.youtube;
 import com.example.filipsaina.videoping.RecycleViewItemData;
 import com.example.filipsaina.videoping.provider.Provider;
 import com.example.filipsaina.videoping.provider.ProviderList;
+import com.example.filipsaina.videoping.provider.ProviderUtil;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -13,9 +14,14 @@ import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Thumbnail;
 
+import org.joda.time.Period;
+import org.joda.time.format.ISOPeriodFormat;
+import org.joda.time.format.PeriodFormatter;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -30,7 +36,7 @@ public class YoutubeProvider implements Provider {
     private static final String PROVIDER_NAME = "Youtube";
     protected static final String YOUTUBE_API_KEY = "AIzaSyD0dkCKWmkzLIJJ0ALFokXlnq7e9n9epyo";
     private static final String APPLICATION_NAME = "Video ping";
-    private static final long LIMIT_RESULTS = 50;       //maximum number of elements per search
+    private static final long LIMIT_RESULTS = 15;       //define maximum number of elements per search
     private static final String PROVIDER_EMBED_URL_PREFIX = "http://www.youtube.com/embed/";
     private static final String PROVIDER_EMBED_URL_SUFFIX = "?rel=0&amp;autoplay=1&showinfo=0&controls=0";
     private static final String START_TIME_SUFFIX = "&start=";
@@ -66,7 +72,7 @@ public class YoutubeProvider implements Provider {
             SearchListResponse searchResponse = search.execute();
             List<SearchResult> searchResultList = searchResponse.getItems();
             if (searchResultList != null) {
-                dataFormat(searchResultList.iterator());
+                dataFormat(searchResultList);
             }
 
         } catch (IOException e) {
@@ -99,23 +105,49 @@ public class YoutubeProvider implements Provider {
     from type <SearchResult> into <RecycleViewItemData> that is required for the
     fetchDataFromServer method
     */
-    private void dataFormat(Iterator<SearchResult> iteratorSearchResults) {
-        while (iteratorSearchResults.hasNext()) {
+    private void dataFormat(List<SearchResult> SearchResults) {
 
-            SearchResult singleVideo = iteratorSearchResults.next();
+        for(int i=0; i<SearchResults.size();i++){
+            SearchResult singleVideo = SearchResults.get(i);
             ResourceId rId = singleVideo.getId();
-
 
             // Confirm that the result represents a video. Otherwise, the
             // item will not contain a video ID.
             if (rId.getKind().equals("youtube#video")) {
                 Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
+
+                //retrive the full videoData
+                String response = "https://www.googleapis.com/youtube/v3/videos?id=VIDEOID&part=contentDetails&key=APIKEY";
+                response = response.replaceAll("VIDEOID", rId.getVideoId());
+                response = response.replaceAll("APIKEY", YOUTUBE_API_KEY);
+                String videoJsonResponse = ProviderUtil.performHttpConnection(response);
+                String duration="";
+                int durationSeconds =0;
+
+                //Google API v3 requires another call to get the video duration
+                try {
+                    JSONObject json = new JSONObject(videoJsonResponse);
+                    JSONArray resultArray =json.optJSONArray("items");
+
+                    JSONObject content = resultArray.getJSONObject(0);
+                    JSONObject contentDetails = content.getJSONObject("contentDetails");
+                    duration= contentDetails.get("duration").toString();
+
+                    PeriodFormatter pf = ISOPeriodFormat.standard();
+                    Period period = pf.parsePeriod(duration);
+                    durationSeconds = period.toStandardSeconds().getSeconds();
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 providerResult.add(new RecycleViewItemData(
                         singleVideo.getSnippet().getTitle(),    // video title
                         thumbnail.getUrl(),                     // thumbnail URL
                         rId.getVideoId(),                       // video ID
                         singleVideo.getSnippet().getDescription(), //description of the video
-                        ProviderList.getCurrentProviderIndex()
+                        durationSeconds,                        //duration of the video in seconds
+                        ProviderList.getProviderIndexWithName(getProviderName())
                         ));
             }
         }
