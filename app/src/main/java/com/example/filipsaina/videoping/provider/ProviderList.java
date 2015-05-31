@@ -6,7 +6,7 @@ import com.example.filipsaina.videoping.provider.youtube.YoutubeProvider;
 /**
  * Static class that holds the references to Objects that implemented the Provider interface.
  *      Important: Every Object that implements the Provider interface needs to be
- *      included in this here object(via listOfAllProvides array)
+ *      included in this object(via listOfAllProvides array)
  *
  * Created by filipsaina on 18/05/15.
  */
@@ -15,7 +15,7 @@ import com.example.filipsaina.videoping.provider.youtube.YoutubeProvider;
     Therefore they are introduced in this Object containing static data and methods so they
     can be available trough-out the application.
     This is a workaround to the problem which keeps the code simple and efficient although it
-    is not recommendable (may introduce unexpected application crashes due to Java garbage collector)
+    is not recommendable (may introduce, in some rare cases, unexpected application crashes)
  */
 public class ProviderList {
 

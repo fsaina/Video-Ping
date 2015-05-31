@@ -78,8 +78,8 @@ public class HomeActivity extends AppCompatActivity implements ThreadCompleteLis
 
         //apply the current provider for data grabbing from the Internet
         //>>on the selected Provider class will be done the >fetchDataFromServer< method
-//        Provider selectedProvider = ProviderList.getCurrentProvider();
-//        tm.addProvider(selectedProvider);
+
+        //do search only for the checked drawer items
         List<IDrawerItem> allDrawerItemrs = drawer.getDrawerItems();
         for(IDrawerItem item: allDrawerItemrs){
             if(item instanceof SwitchDrawerItem){
